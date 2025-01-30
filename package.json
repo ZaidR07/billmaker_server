@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "npm install puppeteer-core && node node_modules/puppeteer-core/lib/cjs/puppeteer/cli install chrome firefox edge --path=/tmp/puppeteer-browsers --unsafe-perm=true",
+    "postinstall": "npx puppeteer browsers install chrome firefox edge --path=/tmp/puppeteer-browsers --unsafe-perm=true",
     "build": "npm install",
     "start": "nodemon src/index.js"
   },
@@ -17,6 +17,6 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "nodemon": "^3.1.9",
-    "puppeteer-core": "^24.1.1"
+    "puppeteer": "^24.1.1"
   }
 }
