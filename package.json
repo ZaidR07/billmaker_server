@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install && npx puppeteer browsers install chrome firefox edge --unsafe-perm=true",
+    "postinstall": "npx puppeteer browsers install chrome firefox edge --path=/tmp/puppeteer-browsers --unsafe-perm=true",
+    "build": "npm install",
     "start": "nodemon src/index.js"
   },
   "keywords": [],
