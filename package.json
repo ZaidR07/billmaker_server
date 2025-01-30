@@ -5,8 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "npx puppeteer browsers install chrome firefox edge --path=/tmp/puppeteer-browsers --unsafe-perm=true",
-    "build": "npm install",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon src/index.js"
   },
   "keywords": [],
@@ -17,6 +16,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "nodemon": "^3.1.9",
+    "jspdf": "^2.5.2",
     "puppeteer": "^24.1.1"
   }
 }
