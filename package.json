@@ -5,10 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "node node_modules/puppeteer/lib/cjs/puppeteer/cli install chrome firefox edge --path=/tmp/puppeteer-browsers --unsafe-perm=true",
-    "build": "npm install",
-    "start": "nodemon src/index.js"
-  },
+  "postinstall": "npm install puppeteer && node node_modules/puppeteer/lib/cjs/puppeteer/cli install chrome --path=/tmp/puppeteer-browsers --unsafe-perm=true",
+  "build": "npm install",
+  "start": "nodemon src/index.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
