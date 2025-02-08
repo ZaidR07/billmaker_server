@@ -1,83 +1,152 @@
 import { jsPDF } from "jspdf";
 import fs from "fs";
 import path from "path";
+import "jspdf-autotable";
 
 export const createpdf = async (req, res) => {
   try {
     // Validate incoming data
-    if (!req.body || !req.body.payload || !Array.isArray(req.body.payload) || req.body.payload.length === 0) {
-      return res.status(400).json({ error: "Invalid or missing data in request." });
+    if (
+      !req.body ||
+      !req.body.payload ||
+      !Array.isArray(req.body.payload) ||
+      req.body.payload.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Invalid or missing data in request." });
     }
 
     const itemdata = req.body.payload;
+
     const currentdate = Date.now().toString();
     const invoiceno = currentdate.slice(7, 13);
 
+    const datecolumns = ["Invoice No.", "Date"];
+    const daterows = [[invoiceno, itemdata[0].date]];
+
+    const productcolumns = ["Description", "Quantity", "Amount"];
+    const productrows = itemdata.map((item) => [
+      item.description,
+      item.qty,
+      item.amount,
+    ]);
+
+    const totalamnt = itemdata.reduce((sum, item) => {
+      const amount = parseInt(item.amount);
+      return !isNaN(amount) ? sum + amount : sum;  // Skip invalid amounts
+    }, 0);
+    
+
     const doc = new jsPDF();
-    let yPosition = 10;
+
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    let yoftotal = (10 * itemdata.length) + 11;
+    
+    
+   
+
+    // Set border properties (X, Y, Width, Height)
+    const margin = 12; // Adjust margin as needed
+    doc.setLineWidth(0.5); // Set border thickness
+    doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
+    let yPosition = margin + 10;
+    let xPosition = margin + 5;
 
     // Add company and contact details (check if data exists before adding)
     doc.setFont("Arial", "normal");
     doc.setFontSize(12);
-    
-    if (itemdata[0].fromcompanyname) doc.text(itemdata[0].fromcompanyname, 10, yPosition);
-    yPosition += 10;
-    if (itemdata[0].fromaddress) doc.text(itemdata[0].fromaddress, 10, yPosition);
-    yPosition += 10;
-    if (itemdata[0].fromcontact1) doc.text(itemdata[0].fromcontact1, 10, yPosition);
+
+    doc.setFontSize(20);
+    doc.text("INVOICE", pageWidth - 45, yPosition);
+
+    doc.setFontSize(14);
+
+    if (itemdata[0].fromcompanyname)
+      doc.text(itemdata[0].fromcompanyname, xPosition, yPosition);
+    yPosition += 8;
+    if (itemdata[0].fromaddress)
+      doc.text(itemdata[0].fromaddress, xPosition, yPosition);
+    yPosition += 8;
+    if (itemdata[0].fromcontact1)
+      doc.text(`${itemdata[0].fromcontact1}, `, xPosition, yPosition);
     if (itemdata[0].fromcontact2) {
-      yPosition += 10;
-      doc.text(itemdata[0].fromcontact2, 10, yPosition);
+      doc.text(`${itemdata[0].fromcontact1}`, 48, yPosition);
     }
 
-    // Add Invoice Header
-    yPosition += 20;
-    doc.setFontSize(16);
-    doc.text("INVOICE", 150, yPosition);
     yPosition += 10;
-    doc.setFontSize(12);
-    doc.text(`Invoice No: ${invoiceno}`, 150, yPosition);
-    yPosition += 10;
-    doc.text(`Date: ${itemdata[0].date || "N/A"}`, 150, yPosition);
+    doc.autoTable({
+      head: [datecolumns], // Table headers
+      body: daterows, // Table data
+      startY: yPosition,
+      margin: { left: pageWidth - 80 }, // Position of the table
+      theme: "grid",
+
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 30 },
+      },
+      headStyles: {
+        fillColor: [211, 211, 211], // Light Gray (RGB: 211, 211, 211)
+        textColor: [0, 0, 0],
+        halign: "center",
+        // fontStyle: "bold"
+      },
+      columnStyles: {
+        0: { halign: "center" }, // Center Quantity
+        1: { halign: "center" }, // Center Amount
+      },
+    });
 
     // Add "Bill To" Information
-    yPosition += 20;
+    yPosition += 15;
     doc.setFontSize(14);
-    doc.text("BILL TO", 10, yPosition);
-    yPosition += 10;
+    doc.text("BILL TO", xPosition, yPosition);
+    yPosition += 8;
     doc.setFontSize(12);
-    if (itemdata[0].receivingperson) doc.text(itemdata[0].receivingperson, 10, yPosition);
-    yPosition += 10;
-    if (itemdata[0].tocompanyname) doc.text(itemdata[0].tocompanyname, 10, yPosition);
-    yPosition += 10;
-    if (itemdata[0].tocontact) doc.text(itemdata[0].tocontact, 10, yPosition);
+    if (itemdata[0].receivingperson)
+      doc.text(itemdata[0].receivingperson, xPosition, yPosition);
+    yPosition += 8;
+    if (itemdata[0].tocompanyname)
+      doc.text(itemdata[0].tocompanyname, xPosition, yPosition);
+    yPosition += 8;
+    if (itemdata[0].tocontact)
+      doc.text(itemdata[0].tocontact, xPosition, yPosition);
 
     // Add table header
     yPosition += 20;
-    doc.setFontSize(12);
-    doc.text("Description", 10, yPosition);
-    doc.text("Quantity", 100, yPosition);
-    doc.text("Amount", 170, yPosition);
 
-    // Add table data (check if array is valid)
-    yPosition += 10;
-    itemdata.forEach(item => {
-      if (item.description && item.qty && item.amount) {
-        doc.text(item.description, 10, yPosition);
-        doc.text(item.qty.toString(), 100, yPosition);
-        doc.text(item.amount.toString(), 170, yPosition);
-        yPosition += 10;
-      }
+    doc.autoTable({
+      head: [productcolumns], // Table headers
+      body: productrows, // Table data
+      startY: yPosition,
+      tableWidth: pageWidth - 35, // Adjusted table width
+      margin: { left: xPosition },
+      theme: "grid",
+
+      // Center the text of the entire header and each column
+      headStyles: {
+        fillColor: [211, 211, 211], // Light Gray (RGB: 211, 211, 211)
+        textColor: [0, 0, 0],
+        halign: "center", 
+      },
+
+      columnStyles: {
+        0: { halign: "left" }, // Align Description to left
+        1: { halign: "center" }, // Center Quantity
+        2: { halign: "right" }, // Center Amount
+      },
     });
 
-    // Add footer
-    yPosition += 20;
-    doc.setFontSize(10);
-    doc.text("Thank you for your business! If you have any questions, contact [Name, Phone, Email]", 10, yPosition);
+    yPosition += yoftotal;
+    doc.text("Total", xPosition , yPosition);
+    doc.text(totalamnt.toString(), pageWidth - 40, yPosition);
 
-    // Add watermark
-    doc.setFontSize(10);
-    doc.text("Generated by Zaid Soft@Ware", 120, 270, null, null, "center");
+    doc.setTextColor(0, 0, 255); 
+    doc.text("Generated by @Trex Software Solutions", pageWidth/2 - 32 , pageHeight - 5);
+
 
     // Define PDF save path
     const pdfDir = path.join("pdfs");
@@ -89,20 +158,20 @@ export const createpdf = async (req, res) => {
     }
 
     // Save the PDF file
-    doc.save(pdfPath); 
+    doc.save(pdfPath);
 
     // Send success response
     res.status(200).json({
       message: "PDF generated successfully.",
       path: pdfPath,
     });
-
   } catch (error) {
     console.error("Error generating PDF:", error);
-    res.status(500).json({ error: "Internal server error while generating PDF." });
+    res
+      .status(500)
+      .json({ error: "Internal server error while generating PDF." });
   }
 };
-
 
 export const downloadPDF = async (req, res) => {
   try {
