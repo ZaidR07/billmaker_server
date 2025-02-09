@@ -5,8 +5,10 @@ const router = Router();
 
 router.post("/api/createpdf", createpdf);
 router.post("/api/downloadpdf",downloadPDF);
-router.post("/api/file", () => {
-    console.log("request for file come");
+router.post("/api/file", ( req , res) => {
+    return res.status(200).json({
+        message : "Done"
+    })
     
 });
 

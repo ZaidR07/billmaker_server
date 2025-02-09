@@ -19,6 +19,9 @@ export const createpdf = async (req, res) => {
 
     const itemdata = req.body.payload;
 
+
+    
+
     const currentdate = Date.now().toString();
     const invoiceno = currentdate.slice(7, 13);
 
@@ -71,9 +74,9 @@ export const createpdf = async (req, res) => {
       doc.text(itemdata[0].fromaddress, xPosition, yPosition);
     yPosition += 8;
     if (itemdata[0].fromcontact1)
-      doc.text(`${itemdata[0].fromcontact1}, `, xPosition, yPosition);
+      doc.text(`${itemdata[0].fromcontact1} `, xPosition, yPosition);
     if (itemdata[0].fromcontact2) {
-      doc.text(`${itemdata[0].fromcontact1}`, 48, yPosition);
+      doc.text(`,${itemdata[0].fromcontact1}`, 48, yPosition);
     }
 
     yPosition += 10;
