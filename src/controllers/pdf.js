@@ -136,7 +136,9 @@ export const createpdf = async (req, res) => {
       columnStyles: {
         0: { halign: "left" }, // Align Description to left
         1: { halign: "center" }, // Center Quantity
-        2: { halign: "right" }, // Center Amount
+        2: { halign: "center" }, // Center Amount
+        3: { halign: "right" }, // Center Amount
+
       },
     });
 
