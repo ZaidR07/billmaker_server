@@ -35,7 +35,7 @@ export const createpdf = async (req, res) => {
     ]);
 
     const totalamnt = itemdata.reduce((sum, item) => {
-      const amount = parseInt(item.amount);
+      const amount = parseInt(item.amount * item.qty);
       return !isNaN(amount) ? sum + amount : sum; // Skip invalid amounts
     }, 0);
 
