@@ -19,6 +19,9 @@ export const createpdf = async (req, res) => {
 
     const itemdata = req.body.payload;
 
+    console.log(itemdata);
+    
+
 
     
 
