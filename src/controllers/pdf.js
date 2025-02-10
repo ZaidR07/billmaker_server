@@ -81,7 +81,7 @@ export const createpdf = async (req, res) => {
       head: [datecolumns], // Table headers
       body: daterows, // Table data
       startY: yPosition,
-      margin: { left: pageWidth - 75 }, // Position of the table
+      margin: { left: pageWidth - 70 }, // Position of the table
       theme: "grid",
 
       columnStyles: {
