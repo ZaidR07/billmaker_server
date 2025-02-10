@@ -170,6 +170,8 @@ export const createpdf = async (req, res) => {
     });
   } catch (error) {
     console.error("Error generating PDF:", error);
+    console.log(error);
+    
     res
       .status(500)
       .json({ error: "Internal server error while generating PDF." });
