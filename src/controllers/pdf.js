@@ -19,7 +19,7 @@ export const createpdf = async (req, res) => {
 
     const itemdata = req.body.payload;
 
-    console.log(itemdata);
+   
 
     const currentdate = Date.now().toString();
     const invoiceno = currentdate.slice(7, 13);
@@ -27,11 +27,13 @@ export const createpdf = async (req, res) => {
     const datecolumns = ["Invoice No.", "Date"];
     const daterows = [[invoiceno, itemdata[0].date]];
 
-    const productcolumns = ["Description", "Quantity", "Amount"];
+    const productcolumns = ["Name", "Qty","Rate", "Amount"];
     const productrows = itemdata.map((item) => [
       item.description,
       item.qty,
       item.amount,
+      item.amount * item.qty,
+
     ]);
 
     const totalamnt = itemdata.reduce((sum, item) => {
@@ -139,7 +141,7 @@ export const createpdf = async (req, res) => {
     });
 
     yPosition += yoftotal;
-    doc.text("Total", xPosition, yPosition);
+    doc.text("Total", xPosition + 5, yPosition);
     doc.text(totalamnt.toString(), pageWidth - 40, yPosition);
 
     doc.setTextColor(0, 0, 255);
