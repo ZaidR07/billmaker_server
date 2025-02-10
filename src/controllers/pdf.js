@@ -60,7 +60,7 @@ export const createpdf = async (req, res) => {
     doc.setFontSize(12);
 
     doc.setFontSize(20);
-    doc.text("INVOICE", pageWidth - 25, yPosition);
+    doc.text("INVOICE", pageWidth - 60, yPosition);
 
     doc.setFontSize(14);
 
@@ -81,7 +81,7 @@ export const createpdf = async (req, res) => {
       head: [datecolumns], // Table headers
       body: daterows, // Table data
       startY: yPosition,
-      margin: { left: pageWidth - 85 }, // Position of the table
+      margin: { left: pageWidth - 95 }, // Position of the table
       theme: "grid",
 
       columnStyles: {
